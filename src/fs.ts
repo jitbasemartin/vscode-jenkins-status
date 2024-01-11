@@ -20,7 +20,7 @@ export function uriJoin(uri: Uri, ...paths: string[]): string {
 }
 
 export async function uriExists(uri: Uri): Promise<boolean> {
-    
+
     try {
         await workspace.fs.stat(uri);
         return true;

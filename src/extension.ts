@@ -16,20 +16,20 @@ declare const __webpack_require__: typeof require;
 declare const __non_webpack_require__: typeof require;
 
 export async function activate(context: vscode.ExtensionContext) {
-    
+
     Container.context = context;
 
     let jenkinsIndicator: JenkinsIndicator;
 
     let currentSettings: Setting[];
-    
+
     if (await hasJenkinsInAnyRoot()) {
         createJenkinsIndicator(context);
         updateStatus();
     }
 
     await registerWhatsNew();
-    
+
     const dispUpdateStatus = vscode.commands.registerCommand("jenkins.updateStatus", () => updateStatus(true));
     context.subscriptions.push(dispUpdateStatus);
 
@@ -48,7 +48,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!await hasJenkinsInAnyRoot()) {
             vscode.window.showWarningMessage(l10n.t("The project is not enabled for Jenkins. Missing .jenkins file."));
             return;
-        } 
+        }
 
         const settings = currentSettings;
         if (!settings.length) {
@@ -64,7 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
             });
         } else {
             vscode.commands.executeCommand("Jenkins." + settings[0].name + ".openInJenkins");
-        }        
+        }
     });
     context.subscriptions.push(dispOpenInJenkins);
 
@@ -72,7 +72,7 @@ export async function activate(context: vscode.ExtensionContext) {
         if (!await hasJenkinsInAnyRoot()) {
             vscode.window.showWarningMessage(l10n.t("The project is not enabled for Jenkins. Missing .jenkins file."));
             return;
-        } 
+        }
 
         const settings = currentSettings;
         if (!settings.length) {
@@ -88,15 +88,15 @@ export async function activate(context: vscode.ExtensionContext) {
             });
         } else {
             vscode.commands.executeCommand("Jenkins." + settings[0].name + ".openInJenkinsConsoleOutput");
-        }   
+        }
     });
     context.subscriptions.push(dispOpenInJenkinsConsoleOutput);
-    
+
     function createJenkinsIndicator(aContext: vscode.ExtensionContext) {
         if (jenkinsIndicator) {
             return;
         }
-        
+
         jenkinsIndicator = new JenkinsIndicator();
         aContext.subscriptions.push(jenkinsIndicator);
     }
@@ -107,11 +107,11 @@ export async function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        if (jenkinsIndicator) { 
+        if (jenkinsIndicator) {
             currentSettings = jenkinsIndicator.updateJenkinsStatus(await getCurrentSettings(), registerCommand, deRegisterCommand);
         }
     }
-    
+
     // let interval;
     const polling: number = vscode.workspace.getConfiguration("jenkins").get("polling", 0);
     if (polling > 0) {
@@ -146,7 +146,7 @@ export async function activate(context: vscode.ExtensionContext) {
         let settings: Setting[] = [];
         try {
             for (const element of vscode.workspace.workspaceFolders) {
-                const jenkinsSettingsPath = await getConfigPath(element.uri);            
+                const jenkinsSettingsPath = await getConfigPath(element.uri);
                 if (jenkinsSettingsPath.fsPath !== element.uri.fsPath) {
                     const jenkinsSettings = await readSettings(jenkinsSettingsPath);
                     if (!jenkinsSettings) {
@@ -155,7 +155,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     const jenkinsSettings2 = Array.isArray(jenkinsSettings) ? jenkinsSettings : [jenkinsSettings];
                     settings = settings.concat(...jenkinsSettings2);
                 }
-            }       
+            }
         } catch (error) {
             vscode.window.showErrorMessage(l10n.t("Error while retrieving Jenkins settings"));
         }
@@ -198,7 +198,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     foundIndex = index;
                     break;
                 }
-            }            
+            }
         }
 
         if (foundIndex > -1) {

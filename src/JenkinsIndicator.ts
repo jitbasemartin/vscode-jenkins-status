@@ -18,11 +18,11 @@ export class JenkinsIndicator {
         this.hideReadOnly(this.statusBarItems);
     }
 
-    public updateJenkinsStatus(settings: Setting[], registerCommand: (cmd: string, callback: () => void ) => void, deRegisterCommand: (cmd: string) => void): Setting[] {        
+    public updateJenkinsStatus(settings: Setting[], registerCommand: (cmd: string, callback: () => void ) => void, deRegisterCommand: (cmd: string) => void): Setting[] {
         if (!settings) {
             return;
         }
-        
+
         let noNameCount = -1;
         this.settingNameToUrl = {};
 
@@ -51,8 +51,8 @@ export class JenkinsIndicator {
                         if (status.connectionStatus === Jenkins.ConnectionStatus.Connected) {
                             vscode.env.openExternal(vscode.Uri.parse(this.settingNameToUrl[setting.name] + status.buildNr.toString() + "/console"));
                         } else {
-                            vscode.window.showWarningMessage(l10n.t("The Jenkins job has some connection issues. Please check the status bar for more information."));     
-                        }   
+                            vscode.window.showWarningMessage(l10n.t("The Jenkins job has some connection issues. Please check the status bar for more information."));
+                        }
                     });
                 });
             }
@@ -75,8 +75,8 @@ export class JenkinsIndicator {
                 this.statusBarItems[setting.name].tooltip = l10n.t("No URL Defined");
                 this.statusBarItems[setting.name].text = "Jenkins " + codicons.x;
                 continue;
-            }     
-            
+            }
+
             jjj.getStatus(url, user, pw)
                 .then((status) => {
 
@@ -84,7 +84,7 @@ export class JenkinsIndicator {
                     const tooltipStatus = l10n.t("Status: {0}", status.statusName);
                     const tooltipUrl = l10n.t("URL: {0}", status.url);
                     const tooltipConnectionStatus = l10n.t("Connection Status: {0}", status.connectionStatusName);
-                    const tooltipBuild = status.buildNr !== undefined 
+                    const tooltipBuild = status.buildNr !== undefined
                         ? l10n.t("Build #: {0}", status.buildNr)
                         : undefined;
                     const tooltipCode = status.code !== undefined
@@ -95,11 +95,11 @@ export class JenkinsIndicator {
                         tooltipStatus + "\n" +
                         tooltipUrl + "\n" +
                         tooltipConnectionStatus;
-                    if (tooltipBuild !== undefined) 
+                    if (tooltipBuild !== undefined)
                         tooltip = tooltip + "\n" + tooltipBuild;
                     if (tooltipCode !== undefined)
                         tooltip = tooltip + "\n" + tooltipCode;
-                    
+
                     let icon: string;
                     switch (status.status) {
                         case Jenkins.BuildStatus.InProgress:
@@ -113,11 +113,11 @@ export class JenkinsIndicator {
                         case Jenkins.BuildStatus.Failed:
                             icon = codicons.alert;
                             break;
-                    
+
                         default:
                             icon = codicons.stop;
                     }
-                        
+
                     this.statusBarItems[setting.name].text = icon + " " + setting.name;
                     this.statusBarItems[setting.name].tooltip = tooltip;
                     this.statusBarItems[setting.name].show();
@@ -133,13 +133,13 @@ export class JenkinsIndicator {
                 delete tmpStatusBarItems[key];
             }
         }
-        
+
         this.hideReadOnly(tmpStatusBarItems);
         for (const key in tmpStatusBarItems) {
             // eslint-disable-next-line no-prototype-builtins
             if (tmpStatusBarItems.hasOwnProperty(key)) {
                 deRegisterCommand("Jenkins." + key + ".openInJenkins");
-                deRegisterCommand("Jenkins." + key + ".openInJenkinsConsoleOutput");                
+                deRegisterCommand("Jenkins." + key + ".openInJenkinsConsoleOutput");
             }
         }
 
@@ -151,7 +151,7 @@ export class JenkinsIndicator {
             // eslint-disable-next-line no-prototype-builtins
             if (items.hasOwnProperty(key)) {
                 const statusBarItem = items[key];
-                statusBarItem.dispose();                
+                statusBarItem.dispose();
             }
         }
     }

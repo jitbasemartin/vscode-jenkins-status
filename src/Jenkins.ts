@@ -28,17 +28,17 @@ export interface JenkinsStatus {
    * colorToBuildStatus
    */
 export function colorToBuildStatus(color: string): BuildStatus {
-  
+
     if(color.endsWith('_anime')) { return BuildStatus.InProgress; }
 
     switch (color) {
       case "blue" :
         return BuildStatus.Success;
-     
+
       case "red" :
         return BuildStatus.Failed;
-      
-      
+
+
 
       default:
         return BuildStatus.Disabled;
@@ -46,17 +46,17 @@ export function colorToBuildStatus(color: string): BuildStatus {
   }
 
 export function colorToBuildStatusName(color: string): string {
-    
-  switch (color) {	  
-    case "blue" :	      
-      return l10n.t("Success");	
-    case "blue_anime":	
-      return l10n.t("Success");	
-            
-    case "red" :	      
-      return l10n.t("Failed");	
-    case "red_anime":	  
-      return l10n.t("Failed");	
+
+  switch (color) {
+    case "blue" :
+      return l10n.t("Success");
+    case "blue_anime":
+      return l10n.t("Success");
+
+    case "red" :
+      return l10n.t("Failed");
+    case "red_anime":
+      return l10n.t("Failed");
 
 
     case "yellow":
@@ -83,25 +83,25 @@ export function colorToBuildStatusName(color: string): string {
       return l10n.t("Disabled");
   }
 }
-  
+
 export function getConnectionStatusName(status: ConnectionStatus): string {
-  
+
     switch (status) {
       case ConnectionStatus.Connected:
         return l10n.t("Connected");
-        
+
       case ConnectionStatus.InvalidAddress:
         return l10n.t("Invalid Address");
-    
+
       case ConnectionStatus.Error:
         return l10n.t("Error");
-    
+
       default:
         return l10n.t("Authentication Required")
     }
 }
 
-export class Jenkins { 
+export class Jenkins {
 
   public getStatus(url: string, username: string, password: string) {
 
@@ -122,7 +122,7 @@ export class Jenkins {
       } else {
         authInfo = {};
       }
-      
+
       request
         .get(url + "/api/json", authInfo)
         .on("response", function(response) {
@@ -145,14 +145,14 @@ export class Jenkins {
                 connectionStatusName: getConnectionStatusName(ConnectionStatus.Connected),
                 code: undefined
               }
-              
+
               if(result.status === BuildStatus.InProgress) {
                 result.statusName = l10n.t("{0} (in progress)", result.statusName);
               }
               resolve(result);
               break;
             }
-              
+
             case 401:
             case 403:
               result = {
@@ -167,7 +167,7 @@ export class Jenkins {
               }
               resolve(result);
               break;
-          
+
             default:
               result = {
                 jobName: "Invalid URL",
