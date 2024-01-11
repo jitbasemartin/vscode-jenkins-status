@@ -18,7 +18,7 @@ export class JenkinsIndicator {
         this.hideReadOnly(this.statusBarItems);
     }
 
-    public updateJenkinsStatus(settings: Setting[], registerCommand: (cmd: string, callback: () => void ) => void, deRegisterCommand: (cmd: string) => void): Setting[] {
+    public updateJenkinsStatus(settings: Setting[], registerCommand: (cmd: string, callback: () => void ) => void, deRegisterCommand: (cmd: string) => void, projectBranch?: string): Setting[] {
         if (!settings) {
             return;
         }
@@ -57,7 +57,7 @@ export class JenkinsIndicator {
                 });
             }
 
-            const jjj: Jenkins.Jenkins = new Jenkins.Jenkins();
+            const jjj: Jenkins.Jenkins = new Jenkins.Jenkins(projectBranch);
 
             const url = setting.url;
             const user = setting.username ? setting.username : "";

@@ -23,6 +23,33 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let currentSettings: Setting[];
 
+    // Set GIT hook to get branch when jenkins URL is a Multi branch project
+    let gitBranch = ""
+    const gitExtension = vscode.extensions.getExtension('vscode.git').exports;
+    const gitApi = gitExtension.getAPI(1);
+    const setGitBranch = (repo) => {
+        if (!repo) return
+
+        repo.state.onDidChange(() => {
+            const branchName = repo.state.HEAD.name
+            if (gitBranch === branchName) return;
+
+            gitBranch = branchName
+            updateStatus()
+        })
+
+        gitBranch = repo.state.HEAD.name
+    }
+
+    // Set branch with git api, if not initialized setup the open hook
+    if (gitApi.state !== "initialized") {
+        gitApi.onDidOpenRepository((repo) => {
+            setGitBranch(repo)
+        })
+    } else {
+        setGitBranch(gitApi.repositories[0])
+    }
+
     if (await hasJenkinsInAnyRoot()) {
         createJenkinsIndicator(context);
         updateStatus();
@@ -108,7 +135,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
 
         if (jenkinsIndicator) {
-            currentSettings = jenkinsIndicator.updateJenkinsStatus(await getCurrentSettings(), registerCommand, deRegisterCommand);
+            currentSettings = jenkinsIndicator.updateJenkinsStatus(await getCurrentSettings(), registerCommand, deRegisterCommand, gitBranch);
         }
     }
 
