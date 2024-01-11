@@ -23,9 +23,12 @@ export async function activate(context: vscode.ExtensionContext) {
 
     let currentSettings: Setting[];
 
+    const logger = vscode.window.createOutputChannel("Jenkins status");
+
     // Set GIT hook to get branch when jenkins URL is a Multi branch project
     let gitBranch = ""
-    const gitExtension = vscode.extensions.getExtension('vscode.git').exports;
+    try {
+        const gitExtension = vscode.extensions.getExtension('vscode.git').exports;
     const gitApi = gitExtension.getAPI(1);
     const setGitBranch = (repo) => {
         if (!repo) return
@@ -48,6 +51,9 @@ export async function activate(context: vscode.ExtensionContext) {
         })
     } else {
         setGitBranch(gitApi.repositories[0])
+    }
+    } catch (err) {
+        logger.appendLine("Error when get Git branch: " + err)
     }
 
     if (await hasJenkinsInAnyRoot()) {
