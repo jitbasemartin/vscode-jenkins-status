@@ -3,7 +3,7 @@
 *  Licensed under the MIT License. See License.md in the project root for license information.
 *--------------------------------------------------------------------------------------------*/
 import request = require("request");
-import { l10n } from "vscode";
+import { Uri, l10n } from "vscode";
 
 export enum BuildStatus {
   Success, Failed, Disabled, InProgress
@@ -103,6 +103,11 @@ export function getConnectionStatusName(status: ConnectionStatus): string {
 
 export class Jenkins {
 
+  constructor(private projectBranch?: string) {
+    // Escape special character from branch name
+    this.projectBranch = encodeURIComponent(this.projectBranch);
+  }
+
   public getStatus(url: string, username: string, password: string) {
 
     return new Promise<JenkinsStatus>((resolve, reject) => {
@@ -131,10 +136,15 @@ export class Jenkins {
         .on("data", function(chunk) {
           data += chunk;
         })
-        .on("end", function() {
+        .on("end", async function() {
           switch (statusCode) {
             case 200: {
               const myArr = JSON.parse(data);
+              if (myArr._class === "org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject") {
+                // If response class is multi-branch project, find the job url based on local repo project branch
+                return await this.getStatus(Uri.joinPath(Uri.parse(url), "/job", this.projectBranch).toString(), username, password);
+              }
+
               result = {
                 jobName: myArr.displayName,
                 url: myArr.url,
