@@ -110,13 +110,13 @@ export class Jenkins {
 
   public getStatus(url: string, username: string, password: string) {
 
-    return new Promise<JenkinsStatus>((resolve, reject) => {
+    return new Promise<JenkinsStatus>((resolve) => {
 
       let data = "";
       let statusCode: number;
       let result: JenkinsStatus;
 
-      let authInfo: any;
+      let authInfo: object;
       if (username) {
         authInfo = {
           auth: {
